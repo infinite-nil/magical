@@ -1,22 +1,22 @@
-import { supabase } from "../services/supabase";
+import { useUser, Auth } from "@supabase/supabase-auth-helpers/react";
+import { supabaseClient } from "@supabase/supabase-auth-helpers/nextjs";
 
 export default function Home() {
-  async function handleLogin() {
-    await supabase.auth.signIn(
-      {
-        provider: "github",
-      },
-      {
-        scopes:
-          "repo gist notifications admin:org user delete_repo write:discussion admin:enterprise",
-      }
-    );
-  }
+  const { user, error } = useUser();
 
   return (
-    <div>
-      <h1 className="text-3xl font-bold underline">Hello world!</h1>
-      <button onClick={handleLogin}>Login</button>
-    </div>
+    <>
+      {!user && (
+        <div className="w-60">
+          {error && <p>{error.message}</p>}
+          <Auth
+            supabaseClient={supabaseClient}
+            providers={["github"]}
+            socialLayout="horizontal"
+            onlyThirdPartyProviders
+          />
+        </div>
+      )}
+    </>
   );
 }
